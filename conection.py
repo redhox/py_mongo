@@ -1,33 +1,36 @@
-import pymongo
+from pymongo import MongoClient
 from dotenv import load_dotenv
 import os
-
 load_dotenv()
-#client = pymongo.MongoClient(f"mongodb://{user_bdd = os.getenv('USER_BDD')}:{password = os.getenv('PASSWORD')}@{host =os.getenv('HOST')}:{port = os.getenv('PORT')}")
 
+class MongoAccess : 
+    __USER = os.getenv('USER_BDD')
+    __PW = os.getenv('PASSWORD')
+    __HOST = os.getenv('HOST')
+    __PORT = os.getenv('PORT')
+    __DB_NAME = os.getenv('BDD')
+    __COLLECTION_NAME = os.getenv('COLLECTION')
 
-host = os.getenv('HOST')
-port = os.getenv('PORT')
-user = os.getenv('USER_BDD')
-password = os.getenv('PASSWORD')
-bdd = os.getenv('BDD')
+    @classmethod
+    def connexion(cls) :
+        cls.client = MongoClient(f"mongodb://{cls.__USER}:{cls.__PW}@{cls.__HOST}:{cls.__PORT}")
 
-uri = f"mongodb://{user}:{password}@{host}:{port}"
-client = pymongo.MongoClient(uri)
+        cls.db = cls.client[cls.__DB_NAME]
+        cls.collection = cls.db[cls.__COLLECTION_NAME]
 
-db = client.get_database(bdd)
-collection = db.films
+    @classmethod
+    def deconnexion(cls) :
+        cls.client.close()
 
-"""
-# Insertion d'un document
-document = {
-    "title": "Mon article",
-    "content": "Ceci est mon article dans MongoDB",
-}
-collection.insert_one(document)
-"""
-# Récupération de tous les documents
-documents = collection.find()
-
-for document in documents:
-    print(document,'\n')
+    @classmethod
+    def get_element(cls, nom):
+        cls.collection.find_one({"nom":nom})
+    
+    @classmethod
+    def get_elements(cls):
+        tous = cls.collection.find()
+        return list(tous)
+    
+    @classmethod
+    def set_element(cls, nouveau) :
+        cls.collection.insert_one(nouveau.to_json())
