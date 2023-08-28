@@ -10,11 +10,12 @@ host = os.getenv('HOST')
 port = os.getenv('PORT')
 user = os.getenv('USER_BDD')
 password = os.getenv('PASSWORD')
+bdd = os.getenv('BDD')
 
 uri = f"mongodb://{user}:{password}@{host}:{port}"
 client = pymongo.MongoClient(uri)
 
-db = client.avis
+db = client.get_database(bdd)
 collection = db.films
 
 """
